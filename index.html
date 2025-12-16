@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Antrian Family Mart Kayutangan (M/M/1 Final)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@40400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        /* ===== FRONT PAGE LAYOUT ===== */
+
+.front-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 900px) {
+    .front-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.location-panel {
+    background-color: #dff1e4;
+    border: 2px solid #9fd0b2;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.location-panel h2 {
+    margin-top: 0;
+    color: #1b7f4a;
+    font-weight: 800;
+}
+
+.location-content {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.location-content img {
+    width: 180px;
+    border-radius: 10px;
+    border: 2px solid #a7d7ba;
+}
+
+.location-text {
+    font-size: 0.95em;
+}
+
+        :root {
+            --color-primary: #54b2b7;
+            --color-secondary: #80c7c7;
+            --color-light-blue: #b6e9f0;
+            --color-light-yellow: #f3de9b;
+            --color-page-background: #ffe0b2;
+            --color-card: #ffffff;
+            --color-success: #66bb6a;
+            --color-accent: #ffb74d;
+            --color-danger: #ef5350;
+        }
+
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            color: #333; 
+            margin: 0; 
+            padding: 0;
+            background-color: var(--color-page-background); 
+            background-image: linear-gradient(135deg, var(--color-light-blue) 0%, var(--color-page-background) 100%);
+            min-height: 100vh;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .logo-univ {
+            max-width: 120px;   /* atur sesuai kebutuhan */
+            height: auto;
+        }
+
+        .container { 
+            max-width: 1200px; 
+            margin: 30px auto; 
+            background-color: var(--color-card); 
+            padding: 30px; 
+            border-radius: 18px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); 
+        }
+
+        h1 { 
+            text-align: center; 
+            color: #3a8a8f;
+            margin-top: 0; 
+            margin-bottom: 15px; 
+            border-bottom: 3px solid var(--color-light-blue); 
+            padding-bottom: 10px; 
+            font-weight: 700;
+            font-size: 2.2em;
+        }
+
+        .project-info { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            border: 2px solid #a8c8d8;
+            border-radius: 10px; 
+            background-color: #e8f4f8;
+            font-size: 0.95em;
+        }
+        .project-info p { margin: 5px 0; color: #333; }
+
+        .content-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+        
+        .input-section {
+            flex: 1 1 350px;
+            max-width: 400px;
+        }
+        
+        h2 { 
+            color: var(--color-primary); 
+            margin-top: 15px; 
+            margin-bottom: 15px; 
+            font-weight: 700;
+        }
+
+        .input-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 18px; 
+            margin-bottom: 20px; 
+            background-color: var(--color-light-yellow);
+            padding: 25px; 
+            border-radius: 12px; 
+            border-left: 5px solid var(--color-accent);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .input-item label { 
+            display: block; 
+            font-weight: 700; 
+            flex-basis: 170px; 
+            min-width: 170px;
+            color: #333;
+            flex-shrink: 0;
+        }
+        .input-item input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border-radius: 8px; 
+            border: 2px solid #ddd; 
+            font-size: 16px; 
+            box-sizing: border-box;
+        }
+        .input-item input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(84, 178, 183, 0.1);
+        }
+
+        .control-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .control-buttons button { 
+            padding: 12px 18px; 
+            font-weight: 700; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 6px; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #btnRunFull { background-color: var(--color-secondary); color: white; }
+        #btnReset { background-color: var(--color-danger); color: white; }
+        #btnExport { background-color: var(--color-accent); color: white; }
+        #btnDownloadGraphics { background-color: #f5bdd0; color: white; }
+        #btnPrintPDF { background-color: var(--color-success); color: white; }
+
+        .control-buttons button:hover:not(:disabled) { 
+            opacity: 1.0; 
+            transform: translateY(-1px);
+        }
+        .control-buttons button:disabled { background-color: #ccc; cursor: not-allowed; opacity: 0.7; }
+
+        #results { margin-top: 40px; padding-top: 20px; border-top: 3px solid var(--color-secondary); }
+        
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        
+        .metric-card { 
+            background-color: #f5d7e3;
+            padding: 25px; 
+            border-radius: 10px; 
+            border: 2px solid #e8b8c8;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .metric-card h4 { 
+            color: #333;
+            margin: 0 0 12px 0; 
+            font-size: 1.1em;
+            font-weight: 600; 
+        }
+        .metric-value { 
+            font-size: 1.8em;
+            font-weight: 900;
+            color: #ff6b9d;
+            margin: 15px 0; 
+        }
+
+        #results h2 {
+            color: #ff6b9d;
+        }
+
+        .chart-container { 
+            margin-bottom: 40px; 
+            background: var(--color-card); 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            height: 400px; 
+        }
+        .chart-container h3 { color: var(--color-primary); }
+
+        .table-wrapper { overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { font-weight: 700; }
+
+        #full-customer-data-table { background-color: #fff9e6; }
+        #full-customer-data-table th { background-color: #f5e6b3; }
+
+        #step-data-table { background-color: #f0e6f5; }
+        #step-data-table th { background-color: #d4b3e5; }
+
+        .table-controls { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .table-controls button { 
+            padding: 8px 15px; 
+            background-color: var(--color-secondary); 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: 700;
+        }
+        .table-controls button:hover { background-color: var(--color-primary); }
+        /* ===============================
+        HASIL TIAP REPLIKASI (HIJAU)
+        ================================ */
+
+        .replication-summary {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ecf8f0;
+            border: 2px solid #c8ead5;
+            border-radius: 12px;
+        }
+
+        .replication-summary h3 {
+            margin-top: 0;
+            color: #2e7d32;
+            font-weight: 800;
+        }
+
+        /* TABEL KHUSUS REPLIKASI */
+        .replication-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+            background-color: white;
+        }
+
+        .replication-table th {
+            background-color: #dff3e6;
+            color: #2e7d32;
+            font-weight: 800;
+            text-align: center;
+            padding: 12px;
+            border: 1px solid #b7dfc4;
+        }
+
+        .replication-table td {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #e2f1e8;
+        }
+
+        .replication-table tbody tr:nth-child(even) {
+            background-color: #f4fbf7;
+        }
+
+        .replication-table tbody tr:hover {
+            background-color: #e6f6ed;
+        }
+
+        /* REPLICATION SELECTOR */
+        .replication-selector { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background-color: #e8f4f8; 
+            border-radius: 10px; 
+            border: 2px solid #a8c8d8; 
+        }
+        .replication-selector h3 { 
+            color: #3a8a8f; 
+            margin-top: 0; 
+        }
+        .replication-buttons { 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+        }
+        .replication-buttons button { 
+            padding: 10px 15px; 
+            background-color: var(--color-secondary); 
+            color: white; 
+            border: 2px solid transparent; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 700; 
+        }
+        .replication-buttons button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
+        }
+        .replication-buttons button.active { 
+            background-color: #ff6b9d; 
+            border: 2px solid #ff6b9d; 
+        }
+
+        #replication-detail { display: none; margin-top: 40px; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <div class="logo-container">
+                <img src="https://github.com/luizabere/asset/blob/main/logo%20ma%20chung.png?raw=true" alt="Logo Ma Chung" style="max-width: 250px;">
+            </div>
+        </div>
+
+        <h1>Simulasi Antrian Family Mart Kayutangan (M/M/1)</h1>
+
+        <div class="project-info">
+            <p><strong>Dosen Pengampu:</strong> Dr. Kestrilia Rega Prilianti., M.Si</p>
+            <p><strong>Mata Kuliah:</strong> Pemodelan dan Simulasi</p>
+            <p><strong>Anggota Kelompok:</strong> Anwen Steven Athena Cahyono/312410004 | Scolastika Luiza Abuk Iru Bere/312410018 | Jeremy Marcellino Limantoro/312410010</p>
+    </div>
+        <!-- ================= FRONT PAGE ================= -->
+        <div class="front-layout">
+            <!-- ===== KIRI: PARAMETER INPUT ===== -->
+            <div class="input-panel">
+
+                <h2>Parameter Input</h2>
+
+                <div class="input-group">
+
+                    <div class="input-item">
+                        <label>Jumlah Pelanggan (N):</label>
+                        <input type="number" id="pelanggan" value="100">
+                    </div>
+
+                    <div class="input-item">
+                        <label>Beta Kedatangan:</label>
+                        <input type="number" id="betaA" step="0.01" value="2.34">
+                    </div>
+
+                    <div class="input-item">
+                        <label>Beta Pelayanan:</label>
+                        <input type="number" id="betaS" step="0.01" value="1.37">
+                    </div>
+
+                    <div class="input-item">
+                        <label>Jumlah Replikasi (R):</label>
+                        <input type="number" id="replikasi" value="5">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ===== KANAN: INFO LOKASI ===== -->
+            <div class="location-panel">
+
+                <h2>📍Family Mart Kayutangan</h2>
+
+                <div class="location-content">
+
+                    <img src="https://github.com/luizabere/asset2/blob/main/familymart-kayutangan.jpeg?raw=true" alt="Family Mart Kayutangan">
+
+                    <div class="location-text">
+                        <p>
+                            Family Mart Kayutangan adalah salah satu minimarket strategis
+                            yang ramai dikunjungi, sehingga cocok sebagai objek simulasi
+                            antrian model <strong>M/M/1</strong> kami ini.
+                        </p>
+
+                        <p>
+                            <strong>📌 Alamat:</strong><br>
+                            Jl. Jenderal Basuki Rahmat No.11, Kauman, Kec. Klojen,<br>
+                            Kota Malang, Jawa Timur 65119
+                        </p>
+
+                        <p><strong>🕒 Jam Buka:</strong></p>
+                        <ul>
+                            <li>Minggu – Kamis: 06.00 – 23.00 WIB</li>
+                            <li>Jumat – Sabtu: 06.00 – 00.00 WIB</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <!-- ================= END FRONT PAGE ================= -->
+
+                <div class="control-buttons">
+                    <button id="btnRunFull" onclick="runFullSimulasi()"><i class="fas fa-play"></i> RUN SIMULASI</button>
+                    <button id="btnReset" onclick="resetSimulasi()"><i class="fas fa-redo"></i> RESET</button>
+                    <button id="btnExport" onclick="exportToExcel()" disabled><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <button id="btnDownloadGraphics" onclick="downloadGraphics()" disabled><i class="fas fa-chart-bar"></i> Download Grafik</button>
+                    <button id="btnPrintPDF" onclick="printToPDF()" disabled><i class="fas fa-print"></i> Print PDF</button>
+                </div>
+                <div id="status" style="margin-top: 15px; font-weight: bold; color: var(--color-primary);">Masukkan parameter dan tekan RUN SIMULASI.</div>
+            </div>
+        </div>
+        
+        <div id="results" style="display: none;">
+            <h2><i class="fas fa-file-alt"></i> Rata-rata Hasil Simulasi (Dari Semua Replikasi)</h2>
+            <div class="metrics-grid" id="metrics-output"></div>
+            <div id="metrics"></div>
+            <div id="finalMetrics"></div>
+
+            <div class="replication-selector">
+                <h3><i class="fas fa-tasks"></i> Pilih Replikasi untuk Melihat Detail</h3>
+                <div class="replication-buttons" id="replicationButtonsContainer"></div>
+            </div>
+
+            <div id="replication-detail">
+                <h2 style="color: #ff6b9d; margin-top: 40px;">📋 Detail Replikasi: <span id="current-rep-label">-</span></h2>
+
+                <div class="chart-container" id="chart-container-q">
+                    <h3><i class="fas fa-chart-line"></i> Grafik Jumlah Antrian Q(t)</h3>
+                    <canvas id="chartQt"></canvas>
+                </div>
+                <div class="chart-container" id="chart-container-b">
+                    <h3><i class="fas fa-server"></i> Grafik Kesibukan Sistem B(t)</h3>
+                    <canvas id="chartBt"></canvas>
+                </div>
+
+                <h3><i class="fas fa-user-check"></i> Detail Data Semua Pelanggan (<span id="total-cust-display">N</span>)</h3>
+                <div class="table-controls">
+                    <button onclick="showAllRows('full-customer-data-table', 10)"><i class="fas fa-eye"></i> Lihat Semua Hasil</button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="full-customer-data-table">
+                        <thead>
+                            <tr>
+                                <th>Pelanggan</th>
+                                <th>Interarrival Time</th>
+                                <th>Arrival Clock</th>
+                                <th>Service Time</th>
+                                <th>Service Begins</th>
+                                <th>Service Ends</th>
+                                <th>Waiting Time (W)</th>
+                                <th>System Time (W+S)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                
+                <h2><i class="fas fa-table"></i> Laporan Event History (Q(t), B(t))</h2>
+                <div class="table-controls">
+                    <button onclick="showAllRows('step-data-table', 10)"><i class="fas fa-eye"></i> Lihat Semua Hasil</button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="step-data-table">
+                        <thead>
+                            <tr>
+                                <th>Clock</th>
+                                <th>Event</th>
+                                <th>Pelanggan Aktif</th>
+                                <th>Status Server (B)</th>
+                                <th>Jumlah Antrian (Q)</th>
+                                <th>Next Arrival Clock</th>
+                                <th>Next Departure Clock</th>
+                                <th>Area Q</th>
+                                <th>Area B</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let totalCustomers = 0;
+        let allReplications = [];
+        let currentReplicationIndex = 0;
+        let chartQtInstance = null;
+        let chartBtInstance = null;
+
+        const LCG_M = 4294967296;
+        const LCG_A = 1664525;
+        const LCG_C = 1013904223;
+
+        function getHybridRandomNumbers(n, seed) {
+            let x = seed >>> 0;
+            const u = [];
+            for (let i = 0; i < n * 2; i++) {
+                x = (LCG_A * x + LCG_C) >>> 0;
+                u.push(x / LCG_M);
+            }
+            return u;
+        }
+
+        function getExponentialTimes(u_data, beta) {
+            if (beta <= 0 || isNaN(beta)) return u_data.map(() => 0);
+            return u_data.map(u => {
+                const u_safe = Math.max(1e-9, Math.min(1 - 1e-9, u));
+                return -beta * Math.log(1 - u_safe);
+            });
+        }
+
+        function showAllRows(tableId, maxPreview = 10) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => { row.style.display = ''; });
+            const button = event.target;
+            button.innerHTML = '<i class="fas fa-eye-slash"></i> Sembunyikan (Preview 10)';
+            button.onclick = function() { hideExtraRows(tableId, maxPreview); };
+        }
+
+        function hideExtraRows(tableId, maxPreview = 10) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                row.style.display = index < maxPreview ? '' : 'none';
+            });
+            const button = event.target;
+            button.innerHTML = '<i class="fas fa-eye"></i> Lihat Semua Hasil';
+            button.onclick = function() { showAllRows(tableId, maxPreview); };
+        }
+
+        function renderReplication(index) {
+            currentReplicationIndex = index;
+            const rep = allReplications[index];
+
+            document.getElementById('current-rep-label').textContent = `Replikasi ${rep.replication}`;
+            renderCustomerTable(rep.customerData);
+            renderEventHistory(rep.eventHistory);
+            renderCharts(rep.chartData, rep.finalMetrics);
+            document.getElementById('replication-detail').style.display = 'block';
+
+            // Update active button
+            document.querySelectorAll('.replication-buttons button').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === index);
+            });
+        }
+
+        function renderReplicationSelector() {
+            const container = document.getElementById('replicationButtonsContainer');
+            container.innerHTML = '';
+            allReplications.forEach((rep, idx) => {
+                const btn = document.createElement('button');
+                btn.textContent = `Replika ${rep.replication}`;
+                btn.onclick = () => renderReplication(idx);
+                if (idx === 0) btn.classList.add('active');
+                container.appendChild(btn);
+            });
+        }
+
+        function runFullSimulasi() {
+            const jumlahPelanggan = parseInt(document.getElementById('pelanggan').value);
+            const betaArrival = parseFloat(document.getElementById('betaA').value);
+            const betaService = parseFloat(document.getElementById('betaS').value);
+            const R = parseInt(document.getElementById('replikasi').value);
+
+            if (isNaN(jumlahPelanggan) || jumlahPelanggan <= 0 ||
+                isNaN(betaArrival) || betaArrival <= 0 ||
+                isNaN(betaService) || betaService <= 0 ||
+                isNaN(R) || R <= 0) {
+                alert("❌ Input tidak valid");
+                return;
+            }
+
+            totalCustomers = jumlahPelanggan;
+            allReplications = [];
+            currentReplicationIndex = 0;
+
+            const baseSeed = Date.now();
+
+            for (let r = 0; r < R; r++) {
+                const seed = baseSeed + r * 1000003;
+                const result = runSingleSimulation({
+                    jumlahPelanggan,
+                    betaArrival,
+                    betaService,
+                    seed
+                });
+
+                allReplications.push({
+                    replication: r + 1,
+                    seed,
+                    finalMetrics: result.finalMetrics,
+                    customerData: result.customerData,
+                    eventHistory: result.eventHistory,
+                    chartData: result.chartData
+                });
+            }
+
+            renderReplicationSelector();
+            renderReplication(0);
+            displayReplicationMetrics(allReplications);
+            displayFinalAverageMetrics(allReplications);
+
+            document.getElementById('status').innerText = `✅ Simulasi selesai: ${R} replikasi, masing-masing ${jumlahPelanggan} pelanggan.`;
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('btnExport').disabled = false;
+            document.getElementById('btnDownloadGraphics').disabled = false;
+            document.getElementById('btnPrintPDF').disabled = false;
+        }
+
+        function runSingleSimulation({ jumlahPelanggan, betaArrival, betaService, seed }) {
+            let chartPointsData = { times: [0.0], q: [0], b: [0] };
+            let eventHistory = [];
+            let finalCustomerData = [];
+
+            const finalRandomNumbers = getHybridRandomNumbers(jumlahPelanggan, seed);
+            const u_arrival = finalRandomNumbers.slice(0, jumlahPelanggan);
+            const u_service = finalRandomNumbers.slice(jumlahPelanggan, jumlahPelanggan * 2);
+
+            const interarrivalTimes = getExponentialTimes(u_arrival, betaArrival);
+            const serviceTimes = getExponentialTimes(u_service, betaService);
+
+            let arrivalClock = 0;
+            for (let i = 0; i < jumlahPelanggan; i++) {
+                arrivalClock += interarrivalTimes[i];
+                finalCustomerData.push({
+                    Pelanggan: i + 1,
+                    Interarrival: interarrivalTimes[i],
+                    Service_Time: serviceTimes[i],
+                    Arrival_Clock: arrivalClock,
+                    Service_Begins: NaN,
+                    Service_Ends: NaN,
+                    Waiting_Time: NaN,
+                    System_Time: NaN
+                });
+            }
+
+            let clock = 0.0, time_last_event = 0.0;
+            let server_status = 0, num_in_queue = 0, queue_list = [];
+            let next_arrival_idx = 0, next_departure_time = Infinity, server_serving_idx = -1;
+            let area_q = 0.0, area_b = 0.0, total_delay = 0.0, number_completed = 0;
+
+            function recordEvent(eventName) {
+                chartPointsData.times.push(clock);
+                chartPointsData.q.push(num_in_queue);
+                chartPointsData.b.push(server_status);
+
+                eventHistory.push({
+                    Clock: clock.toFixed(4),
+                    Event: eventName,
+                    Server: server_status,
+                    Queue: num_in_queue,
+                    Next_Arrival: next_arrival_idx < jumlahPelanggan ? finalCustomerData[next_arrival_idx].Arrival_Clock.toFixed(4) : "INF",
+                    Next_Departure: next_departure_time === Infinity ? "INF" : next_departure_time.toFixed(4),
+                    Area_Q: area_q.toFixed(4),
+                    Area_B: area_b.toFixed(4)
+                });
+            }
+
+            recordEvent("Start");
+
+            while (true) {
+                const nextArrivalTime = (next_arrival_idx < jumlahPelanggan) ? finalCustomerData[next_arrival_idx].Arrival_Clock : Infinity;
+                let eventType, nextEventTime;
+
+                if (nextArrivalTime <= next_departure_time) {
+                    eventType = "Arrival";
+                    nextEventTime = nextArrivalTime;
+                } else {
+                    eventType = "Departure";
+                    nextEventTime = next_departure_time;
+                }
+
+                if (nextEventTime === Infinity) break;
+
+                const duration = nextEventTime - time_last_event;
+                area_q += num_in_queue * duration;
+                area_b += server_status * duration;
+
+                clock = nextEventTime;
+                time_last_event = clock;
+
+                if (eventType === "Arrival") {
+                    const custIdx = next_arrival_idx;
+                    next_arrival_idx++;
+
+                    if (server_status === 0) {
+                        server_status = 1;
+                        server_serving_idx = custIdx;
+                        finalCustomerData[custIdx].Service_Begins = clock;
+                        finalCustomerData[custIdx].Waiting_Time = 0;
+                        const endTime = clock + finalCustomerData[custIdx].Service_Time;
+                        finalCustomerData[custIdx].Service_Ends = endTime;
+                        finalCustomerData[custIdx].System_Time = finalCustomerData[custIdx].Service_Time;
+                        next_departure_time = endTime;
+                        recordEvent(`Arrival → Start Service P${custIdx + 1}`);
+                    } else {
+                        num_in_queue++;
+                        queue_list.push(custIdx);
+                        recordEvent(`Arrival → Queue P${custIdx + 1}`);
+                    }
+
+                } else {
+                    number_completed++;
+
+                    if (num_in_queue > 0) {
+                        const nextCust = queue_list.shift();
+                        num_in_queue--;
+                        server_serving_idx = nextCust;
+                        const wait = clock - finalCustomerData[nextCust].Arrival_Clock;
+                        finalCustomerData[nextCust].Waiting_Time = wait;
+                        total_delay += wait;
+                        finalCustomerData[nextCust].Service_Begins = clock;
+                        const endTime = clock + finalCustomerData[nextCust].Service_Time;
+                        finalCustomerData[nextCust].Service_Ends = endTime;
+                        finalCustomerData[nextCust].System_Time = wait + finalCustomerData[nextCust].Service_Time;
+                        next_departure_time = endTime;
+                        recordEvent(`Departure → Start Service P${nextCust + 1}`);
+                    } else {
+                        server_status = 0;
+                        server_serving_idx = -1;
+                        next_departure_time = Infinity;
+                        recordEvent("Departure → Server Idle");
+                    }
+
+                    if (number_completed === jumlahPelanggan) break;
+                }
+            }
+
+            const total_waktu_simulasi = clock;
+            const d_n = total_delay / jumlahPelanggan;
+            const q_n = area_q / total_waktu_simulasi;
+            const u_n = area_b / total_waktu_simulasi;
+            const w_n = finalCustomerData.reduce((s, c) => s + c.System_Time, 0) / jumlahPelanggan;
+
+            const finalMetrics = {
+                Total_N: jumlahPelanggan,
+                Total_T: total_waktu_simulasi,
+                D_N: d_n,
+                Q_N: q_n,
+                U_N: u_n,
+                W_N: w_n
+            };
+
+            return {
+                finalMetrics,
+                customerData: finalCustomerData,
+                eventHistory,
+                chartData: chartPointsData
+            };
+        }
+
+        function displayReplicationMetrics(allReplications) {
+            let html = `
+                <div class="replication-summary">
+                    <h3><i class="fas fa-leaf" style="color:#2e7d32;"></i> 
+                        Hasil Tiap Replikasi
+                    </h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Replikasi</th>
+                                <th>D(n)<br><small>Waiting</small></th>
+                                <th>Q(n)<br><small>Queue</small></th>
+                                <th>U(n)<br><small>Utilisasi</small></th>
+                                <th>W(n)<br><small>System</small></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            allReplications.forEach(rep => {
+                const m = rep.finalMetrics;
+                html += `
+                    <tr>
+                        <td><strong>${rep.replication}</strong></td>
+                        <td>${m.D_N.toFixed(4)}</td>
+                        <td>${m.Q_N.toFixed(4)}</td>
+                        <td>${(m.U_N * 100).toFixed(2)}%</td>
+                        <td>${m.W_N.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('metrics').innerHTML = html;
+        }
+
+        function displayFinalAverageMetrics(allReplications) {
+            const n = allReplications.length;
+            let sumD = 0, sumQ = 0, sumU = 0, sumW = 0;
+            allReplications.forEach(rep => {
+                const m = rep.finalMetrics;
+                sumD += m.D_N;
+                sumQ += m.Q_N;
+                sumU += m.U_N;
+                sumW += m.W_N;
+            });
+            const avg = { D: sumD / n, Q: sumQ / n, U: sumU / n, W: sumW / n };
+            document.getElementById('finalMetrics').innerHTML = `
+            `;
+            renderMetrics({Total_N: totalCustomers, Total_T: 0, D_N: avg.D, Q_N: avg.Q, U_N: avg.U, W_N: avg.W});
+        }
+
+        function renderMetrics(metrics) {
+            document.getElementById('metrics-output').innerHTML = `
+                <div class="metric-card"><h4>Rata-rata Waktu Menunggu D(n)</h4><div class="metric-value">${metrics.D_N.toFixed(4)}</div></div>
+                <div class="metric-card"><h4>Rata-rata Jumlah Antrian Q(n)</h4><div class="metric-value">${metrics.Q_N.toFixed(4)}</div></div>
+                <div class="metric-card"><h4>Utilitas Server U(n)</h4><div class="metric-value">${(metrics.U_N * 100).toFixed(2)}%</div></div>
+                <div class="metric-card"><h4>Rata-rata Waktu Sistem W(n)</h4><div class="metric-value">${metrics.W_N.toFixed(4)}</div></div>
+            `;
+        }
+
+        function renderCustomerTable(data) {
+            const tbody = document.querySelector('#full-customer-data-table tbody');
+            tbody.innerHTML = '';
+            data.forEach((item, index) => {
+                const row = tbody.insertRow();
+                row.style.display = index < 10 ? '' : 'none';
+                row.insertCell().textContent = item.Pelanggan;
+                row.insertCell().textContent = item.Interarrival.toFixed(4);
+                row.insertCell().textContent = item.Arrival_Clock.toFixed(4);
+                row.insertCell().textContent = item.Service_Time.toFixed(4);
+                row.insertCell().textContent = isNaN(item.Service_Begins) ? '-' : item.Service_Begins.toFixed(4);
+                row.insertCell().textContent = isNaN(item.Service_Ends) ? '-' : item.Service_Ends.toFixed(4);
+                row.insertCell().textContent = isNaN(item.Waiting_Time) ? '-' : item.Waiting_Time.toFixed(4);
+                row.insertCell().textContent = isNaN(item.System_Time) ? '-' : item.System_Time.toFixed(4);
+            });
+            document.getElementById('total-cust-display').textContent = data.length;
+        }
+
+        function renderEventHistory(data) {
+            const tbody = document.querySelector('#step-data-table tbody');
+            tbody.innerHTML = '';
+            data.forEach((item, index) => {
+                const row = tbody.insertRow();
+                row.style.display = index < 10 ? '' : 'none';
+                row.insertCell().textContent = item.Clock;
+                row.insertCell().textContent = item.Event;
+                row.insertCell().textContent = '-';
+                row.insertCell().textContent = item.Server;
+                row.insertCell().textContent = item.Queue;
+                row.insertCell().textContent = item.Next_Arrival;
+                row.insertCell().textContent = item.Next_Departure;
+                row.insertCell().textContent = item.Area_Q;
+                row.insertCell().textContent = item.Area_B;
+            });
+        }
+
+        function renderCharts(data, metrics) {
+            if (chartQtInstance) chartQtInstance.destroy();
+            if (chartBtInstance) chartBtInstance.destroy();
+
+            const ctxQt = document.getElementById('chartQt').getContext('2d');
+            chartQtInstance = new Chart(ctxQt, {
+                type: 'line',
+                data: {
+                    labels: data.times,
+                    datasets: [{
+                        label: `Q(t) - Rata-rata: ${metrics.Q_N.toFixed(4)}`,
+                        data: data.q.map((q, i) => ({ x: data.times[i], y: q })),
+                        borderColor: '#54b2b7',
+                        backgroundColor: 'rgba(84, 178, 183, 0.3)',
+                        fill: 'start',
+                        stepped: 'after',
+                        borderWidth: 2,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'linear', beginAtZero: true },
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            const ctxBt = document.getElementById('chartBt').getContext('2d');
+            chartBtInstance = new Chart(ctxBt, {
+                type: 'line',
+                data: {
+                    labels: data.times,
+                    datasets: [{
+                        label: `B(t) - Utilisasi: ${metrics.U_N.toFixed(4)}`,
+                        data: data.b.map((b, i) => ({ x: data.times[i], y: b })),
+                        borderColor: '#66bb6a',
+                        backgroundColor: 'rgba(102, 187, 106, 0.3)',
+                        fill: 'start',
+                        stepped: 'after',
+                        borderWidth: 2,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'linear', beginAtZero: true },
+                        y: { min: -0.1, max: 1.1 }
+                    }
+                }
+            });
+        }
+
+        function resetSimulasi() {
+            window.location.reload();
+        }
+
+        function exportToExcel() {
+            if (allReplications.length === 0) {
+                alert("Jalankan simulasi terlebih dahulu.");
+                return;
+            }
+            const rep = allReplications[currentReplicationIndex];
+            const customerData = rep.customerData.map(c => ({
+                'Pelanggan': c.Pelanggan,
+                'Interarrival': c.Interarrival.toFixed(6),
+                'Arrival Clock': c.Arrival_Clock.toFixed(6),
+                'Service Time': c.Service_Time.toFixed(6),
+                'Service Begins': isNaN(c.Service_Begins) ? '-' : c.Service_Begins.toFixed(6),
+                'Service Ends': isNaN(c.Service_Ends) ? '-' : c.Service_Ends.toFixed(6),
+                'Waiting Time': isNaN(c.Waiting_Time) ? '-' : c.Waiting_Time.toFixed(6),
+                'System Time': isNaN(c.System_Time) ? '-' : c.System_Time.toFixed(6)
+            }));
+
+            const m = rep.finalMetrics;
+            const summaryData = [
+                {Parameter: 'Total Pelanggan', Nilai: totalCustomers},
+                {Parameter: 'Waktu Simulasi', Nilai: m.Total_T.toFixed(6)},
+                {Parameter: 'D(n) - Waiting', Nilai: m.D_N.toFixed(6)},
+                {Parameter: 'Q(n) - Queue', Nilai: m.Q_N.toFixed(6)},
+                {Parameter: 'U(n) - Utilisasi', Nilai: m.U_N.toFixed(6)},
+                {Parameter: 'W(n) - System', Nilai: m.W_N.toFixed(6)}
+            ];
+
+            const ws1 = XLSX.utils.json_to_sheet(customerData);
+            const ws2 = XLSX.utils.json_to_sheet(summaryData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws1, "Detail");
+            XLSX.utils.book_append_sheet(wb, ws2, "Ringkasan");
+            XLSX.writeFile(wb, `Report_Rep${rep.replication}_N${totalCustomers}.xlsx`);
+        }
+
+        function downloadGraphics() {
+            const charts = ['chart-container-q', 'chart-container-b'];
+            charts.forEach(id => {
+                const canvas = document.querySelector(`#${id} canvas`);
+                if (canvas) {
+                    html2canvas(canvas, {scale: 2}).then(c => {
+                        c.toBlob(b => saveAs(b, `${id}.png`));
+                    });
+                }
+            });
+        }
+
+        async function printToPDF() {
+            const {jsPDF} = window.jspdf;
+            const doc = new jsPDF();
+            const rep = allReplications[currentReplicationIndex];
+            let yPosition = 10;
+
+            doc.setFontSize(16);
+            doc.text(`Laporan Replikasi ${rep.replication}`, 10, yPosition);
+            yPosition += 10;
+
+            doc.setFontSize(12);
+            doc.text(`Total Pelanggan: ${rep.finalMetrics.Total_N}`, 10, yPosition);
+            yPosition += 10;
+            doc.text(`Waktu Simulasi: ${rep.finalMetrics.Total_T.toFixed(4)}`, 10, yPosition);
+            yPosition += 10;
+            doc.text(`D(n) - Rata-rata Waktu Menunggu: ${rep.finalMetrics.D_N.toFixed(4)}`, 10, yPosition);
+            yPosition += 10;
+            doc.text(`Q(n) - Rata-rata Jumlah Antrian: ${rep.finalMetrics.Q_N.toFixed(4)}`, 10, yPosition);
+            yPosition += 10;
+            doc.text(`U(n) - Utilitas Server: ${rep.finalMetrics.U_N.toFixed(4)}`, 10, yPosition);
+            yPosition += 10;
+            doc.text(`W(n) - Rata-rata Waktu Sistem: ${rep.finalMetrics.W_N.toFixed(4)}`, 10, yPosition);
+            yPosition += 20;
+
+            // Add Q(t) Chart
+            const chartQtCanvas = document.getElementById('chartQt');
+            if (chartQtCanvas) {
+                const chartQtImg = await html2canvas(chartQtCanvas, {scale: 2});
+                const chartQtImgData = chartQtImg.toDataURL('image/png');
+                doc.addImage(chartQtImgData, 'PNG', 10, yPosition, 180, 60);
+                yPosition += 70;
+            }
+
+            // Add B(t) Chart
+            const chartBtCanvas = document.getElementById('chartBt');
+            if (chartBtCanvas) {
+                const chartBtImg = await html2canvas(chartBtCanvas, {scale: 2});
+                const chartBtImgData = chartBtImg.toDataURL('image/png');
+                doc.addImage(chartBtImgData, 'PNG', 10, yPosition, 180, 60);
+            }
+
+            doc.save(`Report_Rep${rep.replication}.pdf`);
+        }
+    </script>
+</body>
+</html>
